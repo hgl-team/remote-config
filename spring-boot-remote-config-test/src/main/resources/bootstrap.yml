@@ -1,0 +1,7 @@
+config:
+  remote:
+    name: administracion-seguridad
+    profile: local
+    label: latest
+    retry: true
+    url: http://dev.lujociclas.c:8082/wap/configuracion

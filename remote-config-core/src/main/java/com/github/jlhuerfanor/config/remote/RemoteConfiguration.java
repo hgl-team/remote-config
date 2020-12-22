@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
@@ -44,6 +45,8 @@ public class RemoteConfiguration {
                 .profile(environment.getProperty("config.remote.profile"))
                 .labels(RemoteConfiguration.splitLabelsOrEmpty(environment.getProperty("config.remote.label")))
                 .retry(Boolean.TRUE.equals(environment.getProperty("config.remote.retry", Boolean.class)))
+                .readTimeout(environment.getProperty("config.remote.read-timeout", Integer.class, 1000))
+                .connectTimeout(environment.getProperty("config.remote.connect-timeout", Integer.class, 1000))
                 .build();
     }
 
@@ -93,26 +96,32 @@ public class RemoteConfiguration {
     @Bean
     @Order(0)
     public static PropertySourcesPlaceholderConfigurer remotePropertySource(
-            ApplicationContext context,
+            // ApplicationContext context,
+            ConfigurableApplicationContext configurableContext,
             RemoteConfigServiceClient client) {
         PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
         MutablePropertySources sources = new MutablePropertySources();
         PropertySource<?> propertySource;
 
-        if(context.containsBean("remoteConfigRetryTemplate")) {
-            RetryTemplate retryTemplate = context.getBean("remoteConfigRetryTemplate", RetryTemplate.class);
+        if(configurableContext.containsBean("remoteConfigRetryTemplate")) {
+            RetryTemplate retryTemplate = configurableContext.getBean("remoteConfigRetryTemplate", RetryTemplate.class);
 
             propertySource = retryTemplate.execute(retryContext -> RemoteConfiguration.delegateFetch(
                     retryContext,
-                    context.getEnvironment(),
+                    configurableContext.getEnvironment(),
                     client));
         } else {
-            propertySource = client.fetch(context.getEnvironment());
+            propertySource = client.fetch(configurableContext.getEnvironment());
         }
 
         sources.addLast(propertySource);
+        configurableContext.getEnvironment()
+                .getPropertySources()
+                .addLast(propertySource);
         configurer.setPropertySources(sources);
         configurer.setIgnoreUnresolvablePlaceholders(true);
+        configurer.setIgnoreResourceNotFound(true);
+
         return configurer;
     }
 

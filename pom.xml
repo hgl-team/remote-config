@@ -4,7 +4,7 @@
 
     <groupId>com.github.jlhuerfanor</groupId>
     <artifactId>remote-config</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <modules>
         <module>remote-config-api</module>
         <module>remote-config-core</module>
@@ -79,7 +79,7 @@
         <url>https://dev.lujociclas.com/gitbucket/jlhuerfanor/remote-config</url>
         <developerConnection>scm:git:https://dev.lujociclas.com/gitbucket/git/jlhuerfanor/remote-config.git
         </developerConnection>
-        <tag>v1.0.0</tag>
+        <tag>v1.0.1</tag>
     </scm>
 
     <distributionManagement>

@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.jlhuerfanor</groupId>
+    <groupId>org.hglteam</groupId>
     <artifactId>remote-config</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <modules>
         <module>remote-config-api</module>
         <module>remote-config-core</module>
@@ -13,11 +13,35 @@
     </modules>
     <packaging>pom</packaging>
 
+    <name>remote-config</name>
+    <description>A light remote configuration client library</description>
+    <url>https://github.com/hgl-team/remote-config</url>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Jerson Huerfano</name>
+            <email>huerfano.jerson@gmail.com</email>
+            <organization>hgl-team</organization>
+            <organizationUrl>https://github.com/hgl-team</organizationUrl>
+        </developer>
+    </developers>
+
     <properties>
         <spring.framework.version>5.2.5.RELEASE</spring.framework.version>
         <spring.boot.version>2.2.6.RELEASE</spring.boot.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+
+        <scm.connection>scm:git:https://github.com/hgl-team/remote-config.git</scm.connection>
+        <scm.url>https://github.com/hgl-team/remote-config</scm.url>
+        <scm.developerConnection>scm:git:https://github.com/hgl-team/remote-config.git</scm.developerConnection>
     </properties>
 
     <dependencyManagement>
@@ -60,7 +84,6 @@
         </dependencies>
     </dependencyManagement>
 
-
     <build>
         <plugins>
             <plugin>
@@ -74,22 +97,85 @@
         </plugins>
     </build>
 
-    <scm>
-        <connection>scm:git:https://dev.lujociclas.com/gitbucket/git/jlhuerfanor/remote-config.git</connection>
-        <url>https://dev.lujociclas.com/gitbucket/jlhuerfanor/remote-config</url>
-        <developerConnection>scm:git:https://dev.lujociclas.com/gitbucket/git/jlhuerfanor/remote-config.git
-        </developerConnection>
-        <tag>v1.0.1</tag>
-    </scm>
+    <profiles>
+        <profile>
+            <id>archiva</id>
+            <distributionManagement>
+                <repository>
+                    <id>internal</id>
+                    <url>https://dev.lujociclas.com/archiva/repository/internal/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>snapshots</id>
+                    <url>https://dev.lujociclas.com/archiva/repository/snapshots/</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>github</id>
+            <distributionManagement>
+                <repository>
+                    <id>github</id>
+                    <name>GitHub hgl-team Apache Maven Packages</name>
+                    <url>https://maven.pkg.github.com/hgl-team/remote-config</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>ossrh</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                    <gpgArguments>
+                                        <arg>--pinentry-mode</arg>
+                                        <arg>loopback</arg>
+                                    </gpgArguments>
+                                    <passphraseServerId>my.gpg.key</passphraseServerId>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.7</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+                </snapshotRepository>
+                <repository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+    </profiles>
 
-    <distributionManagement>
-        <repository>
-            <id>internal</id>
-            <url>https://dev.lujociclas.com/archiva/repository/internal/</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <url>https://dev.lujociclas.com/archiva/repository/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
+    <scm>
+        <connection>${scm.connection}</connection>
+        <url>${scm.url}</url>
+        <developerConnection>${scm.developerConnection}</developerConnection>
+        <tag>v1.0.2</tag>
+    </scm>
 </project>

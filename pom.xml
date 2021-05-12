@@ -4,7 +4,7 @@
 
     <groupId>org.hglteam</groupId>
     <artifactId>remote-config</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.3</version>
     <modules>
         <module>remote-config-api</module>
         <module>remote-config-core</module>
@@ -186,6 +186,6 @@
         <connection>${scm.connection}</connection>
         <url>${scm.url}</url>
         <developerConnection>${scm.developerConnection}</developerConnection>
-        <tag>HEAD</tag>
+        <tag>v1.0.3</tag>
     </scm>
 </project>

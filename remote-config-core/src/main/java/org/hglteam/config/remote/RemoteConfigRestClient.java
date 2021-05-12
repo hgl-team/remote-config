@@ -1,5 +1,7 @@
 package org.hglteam.config.remote;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
@@ -11,13 +13,12 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class RemoteConfigRestClient implements RemoteConfigServiceClient {
+    private static final Logger log = LoggerFactory.getLogger(RemoteConfigRestClient.class);
     private final RestTemplate restTemplate;
     private final RemoteConfigRestServiceProperties properties;
     private final RemoteConfigObjectFactory remoteConfigObjectFactory;
@@ -35,13 +36,22 @@ public class RemoteConfigRestClient implements RemoteConfigServiceClient {
     public PropertySource<?> fetch(Environment environment) {
         RemotePropertySource remotePropertySource = remoteConfigObjectFactory.createRemotePropertySource("remoteConfig");
 
+        if(properties.getLabels().length == 0) {
+            throw new RemoteConfigFetchException("No labels were provided.", new IllegalStateException());
+        }
+
         for (String label : properties.getLabels()) {
+            log.info("Fetching properties for label {}...", label);
             SerializableEnvironment remoteEnv = this.getRemoteEnvironment(label);
 
             if(Objects.nonNull(remoteEnv) && Objects.nonNull(remoteEnv.getPropertySources())) {
-                remoteEnv.getPropertySources().stream()
+                Collection<PropertySource<?>> properties = remoteEnv.getPropertySources().stream()
                         .map(this::convertPropertySource)
-                        .forEach(remotePropertySource::addPropertySource);
+                        .collect(Collectors.toList());
+
+                properties.forEach(remotePropertySource::addPropertySource);
+
+                log.info("Registered {} properties from label {}", properties.size(), label);
 
                 if(StringUtils.hasText(remoteEnv.getState())
                         || StringUtils.hasText(remoteEnv.getState())) {
@@ -52,6 +62,8 @@ public class RemoteConfigRestClient implements RemoteConfigServiceClient {
                 }
 
                 return remotePropertySource;
+            } else {
+                log.debug("No configuration found for label {}... Skip.", label);
             }
         }
 
@@ -95,6 +107,10 @@ public class RemoteConfigRestClient implements RemoteConfigServiceClient {
         Throwable lastException = null;
         ResponseEntity<SerializableEnvironment> response = null;
 
+        if(properties.getBaseUris().length == 0) {
+            lastException = new RemoteConfigFetchException("No remote server URI's were provided.", new IllegalStateException());
+        }
+
         for (String uri : properties.getBaseUris()) {
             try {
                 final HttpEntity<Void> noEntity = new HttpEntity<>((Void)null);
@@ -107,10 +123,12 @@ public class RemoteConfigRestClient implements RemoteConfigServiceClient {
                     break;
                 }
             } catch (HttpClientErrorException e){
+                log.debug(String.format("Http Error fetching configuration from '%s':", uri + path), e);
                 if(e.getStatusCode() != HttpStatus.NOT_FOUND) {
                     lastException = e;
                 }
             } catch (Exception e) {
+                log.debug(String.format("Error fetching configuration from '%s':", uri + path), e);
                 lastException = e;
             }
         }

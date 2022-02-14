@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 @Configuration
+@Deprecated
 public class RemoteConfiguration {
     private static final Logger log = LoggerFactory.getLogger(RemoteConfiguration.class);
 

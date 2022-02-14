@@ -4,7 +4,7 @@
 
     <groupId>org.hglteam</groupId>
     <artifactId>remote-config</artifactId>
-    <version>1.0.4-SNAPSHOT</version>
+    <version>1.0.5-SNAPSHOT</version>
     <modules>
         <module>remote-config-api</module>
         <module>remote-config-core</module>
@@ -79,7 +79,7 @@
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>1.18.12</version>
+                <version>1.18.22</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -92,6 +92,13 @@
                 <version>3.8.1</version>
                 <configuration>
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.22</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>

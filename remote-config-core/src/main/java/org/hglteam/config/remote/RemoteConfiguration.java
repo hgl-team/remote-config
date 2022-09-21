@@ -1,10 +1,10 @@
 package org.hglteam.config.remote;
 
+import com.google.gson.Gson;
 import org.hglteam.config.remote.condition.NoRemoteConfigObjectFactoryDefined;
 import org.hglteam.config.remote.condition.NoRemoteConfigRestTemplateDefined;
 import org.hglteam.config.remote.condition.NoRemoteConfigServiceClientDefined;
 import org.hglteam.config.remote.condition.NoRemoteConfigServicePropertiesDefined;
-import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;

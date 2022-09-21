@@ -67,7 +67,16 @@ public class RemoteConfigRestClient implements RemoteConfigServiceClient {
             }
         }
 
-        throw new RemoteConfigFetchException("Could not locate remote config.", new IllegalStateException());
+        String expectedLabels = String.join(" | ", properties.getLabels());
+        String expectedUrls = String.join(", ", properties.getBaseUris());
+
+        throw new RemoteConfigFetchException(
+                String.format("Could not locate remote config.\n\tURL: %s\n\tApplication: %s\n\tAmbiente: %s\n\tEtiquetas: %s",
+                        expectedUrls,
+                        properties.getName(),
+                        properties.getProfile(),
+                        expectedLabels),
+                new IllegalStateException());
     }
 
     private void putValue(HashMap<String, Object> map, String key, String value) {
